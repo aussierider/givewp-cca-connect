@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatIndianCurrency } from "@/utils/currencyUtils";
@@ -25,8 +24,7 @@ const DonationForm = ({ onSubmit }: DonationFormProps) => {
     city: '',
     state: '',
     pincode: '',
-    panNumber: '',
-    message: ''
+    panNumber: ''
   });
 
   const predefinedAmounts = [
@@ -52,7 +50,7 @@ const DonationForm = ({ onSubmit }: DonationFormProps) => {
     const amount = selectedAmount === 'custom' ? customAmount : selectedAmount;
     return amount && parseFloat(amount) >= 100 && 
            donorInfo.firstName && donorInfo.lastName && 
-           donorInfo.email && donorInfo.phone;
+           donorInfo.email;
   };
 
   return (
@@ -169,19 +167,18 @@ const DonationForm = ({ onSubmit }: DonationFormProps) => {
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone Number *</Label>
+            <Label htmlFor="phone">Phone Number</Label>
             <Input
               id="phone"
               type="tel"
               value={donorInfo.phone}
               onChange={(e) => setDonorInfo({...donorInfo, phone: e.target.value})}
-              required
             />
           </div>
         </div>
 
         <div>
-          <Label htmlFor="address">Address</Label>
+          <Label htmlFor="address">Address (for tax exemption certificate)</Label>
           <Input
             id="address"
             value={donorInfo.address}
@@ -223,17 +220,6 @@ const DonationForm = ({ onSubmit }: DonationFormProps) => {
             value={donorInfo.panNumber}
             onChange={(e) => setDonorInfo({...donorInfo, panNumber: e.target.value})}
             placeholder="Optional - for tax exemption certificate"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="message">Message (Optional)</Label>
-          <Textarea
-            id="message"
-            value={donorInfo.message}
-            onChange={(e) => setDonorInfo({...donorInfo, message: e.target.value})}
-            placeholder="Share why you're donating or any special message..."
-            rows={3}
           />
         </div>
       </div>
