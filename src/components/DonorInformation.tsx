@@ -79,7 +79,7 @@ const DonorInformation = ({ donorInfo, onDonorInfoChange }: DonorInformationProp
       </div>
 
       <div>
-        <Label htmlFor="address">Address (for tax exemption certificate)</Label>
+        <Label htmlFor="address">Address</Label>
         <Input
           id="address"
           value={donorInfo.address}
@@ -115,12 +115,12 @@ const DonorInformation = ({ donorInfo, onDonorInfoChange }: DonorInformationProp
       </div>
 
       <div>
-        <Label htmlFor="panNumber">PAN Number (for 80G receipt)</Label>
+        <Label htmlFor="panNumber">PAN Number (for tax exemption certificate)</Label>
         <Input
           id="panNumber"
           value={donorInfo.panNumber}
           onChange={(e) => handleInputChange('panNumber', e.target.value)}
-          placeholder="Optional - for tax exemption certificate"
+          placeholder="(for tax exemption certificate)"
         />
       </div>
     </div>
