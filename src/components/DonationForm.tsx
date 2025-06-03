@@ -90,33 +90,33 @@ const DonationForm = ({ onSubmit }: DonationFormProps) => {
               </div>
             ))}
           </div>
-        </RadioGroup>
 
-        {/* Custom Amount */}
-        <Card className="border-dashed">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-4">
-              <RadioGroupItem value="custom" id="custom" />
-              <Label htmlFor="custom" className="flex-1">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-orange-500" />
-                  Custom Amount
+          {/* Custom Amount */}
+          <Card className="border-dashed">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-4">
+                <RadioGroupItem value="custom" id="custom" />
+                <Label htmlFor="custom" className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-orange-500" />
+                    Custom Amount
+                  </div>
+                </Label>
+                <div className="flex-1">
+                  <Input
+                    type="number"
+                    placeholder="Enter amount (min ₹100)"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    disabled={selectedAmount !== 'custom'}
+                    min="100"
+                    className="text-right"
+                  />
                 </div>
-              </Label>
-              <div className="flex-1">
-                <Input
-                  type="number"
-                  placeholder="Enter amount (min ₹100)"
-                  value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                  disabled={selectedAmount !== 'custom'}
-                  min="100"
-                  className="text-right"
-                />
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </RadioGroup>
 
         {/* Amount Display */}
         <div className="text-center p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
