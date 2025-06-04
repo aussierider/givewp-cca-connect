@@ -1,0 +1,64 @@
+
+/* CCAvenue Gateway Styles */
+#give-ccavenue-custom-fields {
+    margin-top: 20px;
+}
+
+#give-ccavenue-custom-fields fieldset {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+#give-ccavenue-custom-fields legend {
+    font-weight: bold;
+    padding: 0 10px;
+    color: #333;
+}
+
+#give-ccavenue-custom-fields .form-row {
+    margin-bottom: 15px;
+}
+
+#give-ccavenue-custom-fields .form-row:last-child {
+    margin-bottom: 0;
+}
+
+#give-ccavenue-custom-fields .give-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+}
+
+#give-ccavenue-custom-fields .give-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+#give-ccavenue-custom-fields .give-input:focus {
+    outline: none;
+    border-color: #0073aa;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+#give-ccavenue-custom-fields textarea.give-input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #give-ccavenue-custom-fields fieldset {
+        padding: 10px;
+    }
+    
+    #give-ccavenue-custom-fields .give-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
