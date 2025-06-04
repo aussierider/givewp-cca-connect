@@ -1,9 +1,8 @@
-
 <?php
 /**
  * Plugin Name: GiveWP CCAvenue Gateway
  * Plugin URI: https://yourwebsite.com
- * Description: CCAvenue payment gateway integration for GiveWP with tax exemption features
+ * Description: Modern CCAvenue payment gateway integration for GiveWP with tax exemption features
  * Version: 1.0.0
  * Author: Your Name
  * License: GPL v2 or later
@@ -47,71 +46,41 @@ class GiveWP_CCAvenue_Gateway {
         // Initialize gateway
         add_action('give_register_payment_gateway', array($this, 'register_gateway'));
         
-        // Add custom form fields
-        add_action('give_donation_form_before_submit', array($this, 'add_custom_fields'), 10, 1);
-        
-        // Process custom fields
+        // Modern form integration
+        add_action('give_donation_form_before_submit', array($this, 'add_modern_fields'), 10, 1);
         add_action('give_insert_payment', array($this, 'save_custom_fields'), 10, 2);
         
-        // Enqueue scripts and styles
-        add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
+        // Enqueue modern scripts and styles
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_modern_assets'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
+        
+        // Register Gutenberg block
+        add_action('init', array($this, 'register_blocks'));
+        
+        // Register shortcodes
+        add_action('init', array($this, 'register_shortcodes'));
     }
     
     public function includes() {
         require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/class-ccavenue-gateway.php';
         require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/class-ccavenue-crypto.php';
         require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/admin-settings.php';
+        require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/modern-form-fields.php';
+        require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/gutenberg-blocks.php';
+        require_once GIVEWP_CCAVENUE_PLUGIN_DIR . 'includes/shortcodes.php';
     }
     
     public function register_gateway($gateways) {
         $gateways['ccavenue'] = array(
             'admin_label'    => __('CCAvenue', 'givewp-ccavenue'),
-            'checkout_label' => __('CCAvenue', 'givewp-ccavenue'),
+            'checkout_label' => give_get_option('ccavenue_checkout_label', __('Credit Card / Debit Card / Net Banking', 'givewp-ccavenue')),
         );
         return $gateways;
     }
     
-    public function add_custom_fields($form_id) {
-        ?>
-        <div id="give-ccavenue-custom-fields" style="display: none;">
-            <fieldset class="give-fieldset">
-                <legend><?php _e('Tax Exemption Information (Optional)', 'givewp-ccavenue'); ?></legend>
-                
-                <div class="form-row">
-                    <label class="give-label" for="give-pan-number">
-                        <?php _e('PAN Number', 'givewp-ccavenue'); ?>
-                        <span class="give-tooltip give-icon give-icon-question" data-tooltip="<?php _e('Enter your PAN number for tax exemption certificate', 'givewp-ccavenue'); ?>"></span>
-                    </label>
-                    <input type="text" name="give_pan_number" id="give-pan-number" class="give-input" placeholder="<?php _e('ABCDE1234F', 'givewp-ccavenue'); ?>">
-                </div>
-                
-                <div class="form-row">
-                    <label class="give-label" for="give-address">
-                        <?php _e('Address (for tax exemption certificate)', 'givewp-ccavenue'); ?>
-                    </label>
-                    <textarea name="give_address" id="give-address" class="give-input" rows="3" placeholder="<?php _e('Enter your complete address', 'givewp-ccavenue'); ?>"></textarea>
-                </div>
-            </fieldset>
-        </div>
-        
-        <script>
-        jQuery(document).ready(function($) {
-            // Show custom fields only when CCAvenue is selected
-            $('input[name="give-gateway"]').on('change', function() {
-                if ($(this).val() === 'ccavenue') {
-                    $('#give-ccavenue-custom-fields').show();
-                } else {
-                    $('#give-ccavenue-custom-fields').hide();
-                }
-            });
-            
-            // Check initial state
-            if ($('input[name="give-gateway"]:checked').val() === 'ccavenue') {
-                $('#give-ccavenue-custom-fields').show();
-            }
-        });
-        </script>
-        <?php
+    public function add_modern_fields($form_id) {
+        $modern_fields = new GiveWP_CCAvenue_Modern_Fields();
+        $modern_fields->render_fields($form_id);
     }
     
     public function save_custom_fields($payment_id, $payment_data) {
@@ -124,10 +93,30 @@ class GiveWP_CCAvenue_Gateway {
         }
     }
     
-    public function enqueue_scripts() {
-        if (function_exists('give_is_donation_form')) {
-            wp_enqueue_style('givewp-ccavenue-style', GIVEWP_CCAVENUE_PLUGIN_URL . 'assets/style.css', array(), GIVEWP_CCAVENUE_VERSION);
+    public function enqueue_modern_assets() {
+        wp_enqueue_style('givewp-ccavenue-modern', GIVEWP_CCAVENUE_PLUGIN_URL . 'assets/modern-style.css', array(), GIVEWP_CCAVENUE_VERSION);
+        wp_enqueue_script('givewp-ccavenue-modern', GIVEWP_CCAVENUE_PLUGIN_URL . 'assets/modern-script.js', array('jquery'), GIVEWP_CCAVENUE_VERSION, true);
+        
+        wp_localize_script('givewp-ccavenue-modern', 'giveCCAvenue', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('givewp_ccavenue_nonce'),
+        ));
+    }
+    
+    public function enqueue_admin_assets($hook) {
+        if (strpos($hook, 'give') !== false) {
+            wp_enqueue_style('givewp-ccavenue-admin', GIVEWP_CCAVENUE_PLUGIN_URL . 'assets/admin-style.css', array(), GIVEWP_CCAVENUE_VERSION);
         }
+    }
+    
+    public function register_blocks() {
+        $blocks = new GiveWP_CCAvenue_Blocks();
+        $blocks->init();
+    }
+    
+    public function register_shortcodes() {
+        $shortcodes = new GiveWP_CCAvenue_Shortcodes();
+        $shortcodes->init();
     }
     
     public function give_missing_notice() {
@@ -135,12 +124,10 @@ class GiveWP_CCAvenue_Gateway {
     }
     
     public function activate() {
-        // Activation tasks
         flush_rewrite_rules();
     }
     
     public function deactivate() {
-        // Deactivation tasks
         flush_rewrite_rules();
     }
 }
