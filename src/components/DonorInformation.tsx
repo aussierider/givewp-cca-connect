@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Users } from "lucide-react";
@@ -79,7 +78,7 @@ const DonorInformation = ({ donorInfo, onDonorInfoChange }: DonorInformationProp
       </div>
 
       <div>
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address">Address (for tax exemption certificate)</Label>
         <Input
           id="address"
           value={donorInfo.address}
