@@ -212,6 +212,16 @@ const CCAvenuePlatform = ({ donationData, onBack }: CCAvenuePlatformProps) => {
             <p className="text-sm text-blue-700">
               <strong>Email:</strong> {donationData.donorInfo.email}
             </p>
+            {donationData.donorInfo.address && (
+              <p className="text-sm text-blue-700">
+                <strong>Address:</strong> {donationData.donorInfo.address}
+              </p>
+            )}
+            {donationData.donorInfo.panNumber && (
+              <p className="text-sm text-blue-700">
+                <strong>PAN Number:</strong> {donationData.donorInfo.panNumber}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
