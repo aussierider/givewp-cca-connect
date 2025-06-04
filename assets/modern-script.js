@@ -6,46 +6,65 @@
 (function($) {
     'use strict';
     
-    const CCAvenue = {
+    if (typeof $ === 'undefined') {
+        return;
+    }
+    
+    var CCAvenue = {
         
         init: function() {
             this.bindEvents();
-            this.initTooltips();
-            this.validateForms();
+            this.checkInitialState();
         },
         
         bindEvents: function() {
             // Show/hide fields based on gateway selection
             $(document).on('change', 'input[name="give-gateway"]', this.toggleFields);
             
-            // PAN number formatting
+            // PAN number formatting and validation
             $(document).on('input', '#give-pan-number', this.formatPAN);
-            
-            // Form validation
             $(document).on('blur', '#give-pan-number', this.validatePAN);
         },
         
-        toggleFields: function() {
-            const container = $('#givewp-ccavenue-fields');
-            const selectedGateway = $('input[name="give-gateway"]:checked').val();
-            
+        checkInitialState: function() {
+            // Check if CCAvenue is pre-selected
+            var selectedGateway = $('input[name="give-gateway"]:checked').val();
             if (selectedGateway === 'ccavenue') {
-                container.addClass('active').slideDown(300);
-            } else {
-                container.removeClass('active').slideUp(300);
+                this.showFields();
             }
         },
         
-        formatPAN: function() {
-            let value = $(this).val().toUpperCase().replace(/[^A-Z0-9]/g, '');
+        toggleFields: function() {
+            var selectedGateway = $('input[name="give-gateway"]:checked').val();
             
-            // PAN format: ABCDE1234F
+            if (selectedGateway === 'ccavenue') {
+                CCAvenue.showFields();
+            } else {
+                CCAvenue.hideFields();
+            }
+        },
+        
+        showFields: function() {
+            var container = $('#givewp-ccavenue-fields');
+            container.addClass('active').show();
+        },
+        
+        hideFields: function() {
+            var container = $('#givewp-ccavenue-fields');
+            container.removeClass('active').hide();
+        },
+        
+        formatPAN: function() {
+            var value = $(this).val().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            
+            // PAN format: ABCDE1234F (5 letters, 4 numbers, 1 letter)
             if (value.length > 5) {
-                value = value.substring(0, 5) + value.substring(5).replace(/[^0-9]/g, '');
+                var letters = value.substring(0, 5).replace(/[^A-Z]/g, '');
+                var numbers = value.substring(5, 9).replace(/[^0-9]/g, '');
+                var lastLetter = value.substring(9, 10).replace(/[^A-Z]/g, '');
+                value = letters + numbers + lastLetter;
             }
-            if (value.length > 9) {
-                value = value.substring(0, 9) + value.substring(9).replace(/[^A-Z]/g, '');
-            }
+            
             if (value.length > 10) {
                 value = value.substring(0, 10);
             }
@@ -54,96 +73,24 @@
         },
         
         validatePAN: function() {
-            const value = $(this).val();
-            const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-            const fieldGroup = $(this).closest('.givewp-ccavenue-field-group');
+            var value = $(this).val();
+            var panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+            var field = $(this);
             
-            // Remove existing validation messages
-            fieldGroup.find('.validation-message').remove();
+            // Remove existing error messages
+            field.removeClass('invalid');
+            field.siblings('.givewp-ccavenue-error').remove();
             
             if (value && !panPattern.test(value)) {
-                $(this).addClass('invalid');
-                fieldGroup.append('<div class="validation-message error">Please enter a valid PAN number (e.g., ABCDE1234F)</div>');
-            } else {
-                $(this).removeClass('invalid');
+                field.addClass('invalid');
+                field.after('<span class="givewp-ccavenue-error">Please enter a valid PAN number (e.g., ABCDE1234F)</span>');
             }
-        },
-        
-        initTooltips: function() {
-            // Enhanced tooltips for better accessibility
-            $('.givewp-ccavenue-tooltip').each(function() {
-                const tooltip = $(this);
-                const text = tooltip.data('tooltip');
-                
-                tooltip.attr('aria-label', text);
-                tooltip.attr('role', 'button');
-                tooltip.attr('tabindex', '0');
-                
-                // Keyboard support
-                tooltip.on('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        tooltip.trigger('mouseenter');
-                    }
-                });
-            });
-        },
-        
-        validateForms: function() {
-            // Real-time form validation
-            $(document).on('submit', 'form[id*="give-form"]', function(e) {
-                const form = $(this);
-                const gateway = form.find('input[name="give-gateway"]:checked').val();
-                
-                if (gateway === 'ccavenue') {
-                    const panField = form.find('#give-pan-number');
-                    const panValue = panField.val();
-                    
-                    if (panValue && !CCAvenue.isValidPAN(panValue)) {
-                        e.preventDefault();
-                        panField.focus();
-                        CCAvenue.showNotification('Please enter a valid PAN number', 'error');
-                        return false;
-                    }
-                }
-            });
-        },
-        
-        isValidPAN: function(pan) {
-            const panPattern = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-            return panPattern.test(pan);
-        },
-        
-        showNotification: function(message, type) {
-            // Create notification element
-            const notification = $('<div class="givewp-ccavenue-notification ' + type + '">' + message + '</div>');
-            
-            // Add to page
-            $('body').append(notification);
-            
-            // Animate in
-            setTimeout(function() {
-                notification.addClass('show');
-            }, 100);
-            
-            // Remove after 5 seconds
-            setTimeout(function() {
-                notification.removeClass('show');
-                setTimeout(function() {
-                    notification.remove();
-                }, 300);
-            }, 5000);
         }
     };
     
     // Initialize when document is ready
     $(document).ready(function() {
         CCAvenue.init();
-        
-        // Check initial state
-        if ($('input[name="give-gateway"]:checked').val() === 'ccavenue') {
-            $('#givewp-ccavenue-fields').addClass('active');
-        }
     });
     
 })(jQuery);
